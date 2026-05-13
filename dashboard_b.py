@@ -141,73 +141,157 @@ HTML = f"""<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Tech Challenge B — Diagnóstico Hospitalar</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
   :root {{
-    --bg:#080f1e; --surface:#0f1f38; --card:#132040; --border:#1e3a5f;
-    --accent1:#38bdf8; --accent2:#f472b6; --accent3:#22c55e; --danger:#ef4444;
-    --text:#e2e8f0; --muted:#64748b;
-    --mono:'Space Mono',monospace; --sans:'DM Sans',sans-serif;
+    --bg:#f0f7f4;
+    --surface:#ffffff;
+    --card:#ffffff;
+    --border:#c8e6d4;
+    --border-strong:#a0d4b5;
+    --accent1:#1a7a4a;
+    --accent2:#25a266;
+    --accent3:#0f5c36;
+    --danger:#d63a3a;
+    --warning:#e07c1a;
+    --text:#0d2b1e;
+    --muted:#4a7060;
+    --light:#e8f5ee;
+    --mono:'IBM Plex Mono',monospace;
+    --sans:'Plus Jakarta Sans',sans-serif;
   }}
   *,*::before,*::after{{box-sizing:border-box;margin:0;padding:0}}
   html{{scroll-behavior:smooth}}
   body{{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}}
-  body::before{{content:'';position:fixed;inset:0;z-index:0;
-    background-image:linear-gradient(rgba(56,189,248,.04) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(56,189,248,.04) 1px,transparent 1px);
-    background-size:40px 40px;pointer-events:none}}
+
+  /* cruz hospitalar decorativa no fundo */
+  body::before{{
+    content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+    background-image:
+      linear-gradient(rgba(26,122,74,.06) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(26,122,74,.06) 1px,transparent 1px);
+    background-size:48px 48px;
+  }}
+
   .wrap{{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 80px}}
-  header{{padding:60px 0 48px;border-bottom:1px solid var(--border);margin-bottom:52px;
-    display:flex;flex-direction:column;gap:12px;animation:fadeUp .6s ease both}}
-  .tag{{font-family:var(--mono);font-size:11px;letter-spacing:.15em;color:var(--accent1);text-transform:uppercase}}
-  h1{{font-size:clamp(1.8rem,4vw,3rem);font-weight:700;line-height:1.15}}
-  h1 span{{color:var(--accent2)}}
-  .subtitle{{color:var(--muted);font-size:1rem;font-weight:300;max-width:580px;line-height:1.6}}
+
+  /* ── header ── */
+  header{{
+    padding:56px 0 44px;
+    border-bottom:2px solid var(--border-strong);
+    margin-bottom:52px;
+    display:flex;flex-direction:column;gap:14px;
+    animation:fadeUp .6s ease both;
+  }}
+  .header-top{{display:flex;align-items:center;gap:16px}}
+  .cross{{
+    width:44px;height:44px;flex-shrink:0;
+    background:var(--accent1);border-radius:10px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.4rem;color:white;
+  }}
+  .tag{{
+    font-family:var(--mono);font-size:10px;letter-spacing:.18em;
+    color:var(--accent1);text-transform:uppercase;
+    background:var(--light);padding:4px 10px;border-radius:4px;
+    border:1px solid var(--border);display:inline-block;
+  }}
+  h1{{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;line-height:1.15;color:var(--text)}}
+  h1 span{{color:var(--accent1)}}
+  .subtitle{{color:var(--muted);font-size:1rem;font-weight:400;max-width:600px;line-height:1.7}}
+
+  /* ── sections ── */
   section{{margin-bottom:56px;animation:fadeUp .5s ease both}}
   section:nth-child(2){{animation-delay:.1s}} section:nth-child(3){{animation-delay:.2s}}
   section:nth-child(4){{animation-delay:.3s}} section:nth-child(5){{animation-delay:.4s}}
   section:nth-child(6){{animation-delay:.5s}}
-  .section-label{{font-family:var(--mono);font-size:10px;letter-spacing:.2em;
-    color:var(--accent1);text-transform:uppercase;margin-bottom:6px}}
-  h2{{font-size:1.25rem;font-weight:600;margin-bottom:24px}}
-  .metrics-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}}
+  .section-label{{
+    font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+    color:var(--accent2);text-transform:uppercase;margin-bottom:6px;
+  }}
+  h2{{font-size:1.2rem;font-weight:700;margin-bottom:24px;color:var(--text);
+    padding-bottom:10px;border-bottom:1px solid var(--border)}}
+
+  /* ── metric cards ── */
+  .metrics-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}}
   .model-block{{display:flex;flex-direction:column;gap:12px}}
-  .model-title{{font-family:var(--mono);font-size:12px;color:var(--muted);
-    letter-spacing:.1em;padding-bottom:8px;border-bottom:1px solid var(--border)}}
-  .metric-card{{background:var(--card);border:1px solid var(--border);border-radius:12px;
-    padding:20px 24px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s}}
-  .metric-card:hover{{transform:translateY(-3px);border-color:var(--accent1)}}
-  .metric-card::before{{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-    background:var(--accent-line,var(--accent1))}}
-  .metric-card.pink{{--accent-line:var(--accent2)}} .metric-card.green{{--accent-line:var(--accent3)}}
-  .metric-card.red{{--accent-line:var(--danger)}}
-  .metric-label{{font-size:.75rem;color:var(--muted);margin-bottom:6px;
-    text-transform:uppercase;letter-spacing:.08em}}
-  .metric-value{{font-family:var(--mono);font-size:2rem;font-weight:700}}
+  .model-title{{
+    font-family:var(--mono);font-size:11px;color:var(--accent1);
+    letter-spacing:.12em;padding:8px 12px;
+    background:var(--light);border-radius:6px;border:1px solid var(--border);
+  }}
+  .metric-card{{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:20px 24px;position:relative;overflow:hidden;
+    box-shadow:0 2px 8px rgba(26,122,74,.08);
+    transition:transform .2s,box-shadow .2s,border-color .2s;
+  }}
+  .metric-card:hover{{transform:translateY(-3px);box-shadow:0 8px 24px rgba(26,122,74,.15);border-color:var(--accent2)}}
+  .metric-card::before{{
+    content:'';position:absolute;top:0;left:0;right:0;height:3px;
+    background:var(--accent-line,var(--accent1));border-radius:14px 14px 0 0;
+  }}
+  .metric-card.teal {{--accent-line:var(--accent2)}}
+  .metric-card.dark {{--accent-line:var(--accent3)}}
+  .metric-card.red  {{--accent-line:var(--danger)}}
+  .metric-label{{font-size:.72rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.1em}}
+  .metric-value{{font-family:var(--mono);font-size:2rem;font-weight:700;color:var(--accent1)}}
   .badge{{display:inline-block;font-family:var(--mono);font-size:10px;padding:3px 8px;
-    border-radius:4px;margin-top:4px}}
-  .badge.val{{background:#1e3a5f;color:var(--accent1)}} .badge.test{{background:#2d1f3d;color:var(--accent2)}}
-  .chart-card{{background:var(--card);border:1px solid var(--border);border-radius:16px;
-    padding:28px;margin-bottom:20px}}
+    border-radius:4px;margin-top:6px;margin-right:4px}}
+  .badge.val{{background:var(--light);color:var(--accent1);border:1px solid var(--border)}}
+  .badge.test{{background:var(--accent1);color:white}}
+
+  /* ── chart cards ── */
+  .chart-card{{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:28px;margin-bottom:20px;
+    box-shadow:0 2px 12px rgba(26,122,74,.07);
+  }}
   .chart-card img{{width:100%;border-radius:8px}}
-  .chart-title{{font-size:.9rem;font-weight:600;color:var(--muted);margin-bottom:16px;
-    font-family:var(--mono);letter-spacing:.06em}}
+  .chart-title{{
+    font-size:.8rem;font-weight:600;color:var(--muted);margin-bottom:16px;
+    font-family:var(--mono);letter-spacing:.06em;
+    display:flex;align-items:center;gap:8px;
+  }}
+  .chart-title::before{{content:'▸';color:var(--accent2)}}
+
   .two-col{{display:grid;grid-template-columns:1fr 1fr;gap:20px}}
   @media(max-width:680px){{.two-col{{grid-template-columns:1fr}}}}
+
+  /* ── discussion ── */
   .discussion-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}}
-  .disc-card{{background:var(--card);border:1px solid var(--border);border-radius:12px;
-    padding:22px;transition:border-color .2s}}
-  .disc-card:hover{{border-color:var(--accent1)}}
+  .disc-card{{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:24px;transition:border-color .2s,box-shadow .2s;
+    box-shadow:0 2px 8px rgba(26,122,74,.06);
+  }}
+  .disc-card:hover{{border-color:var(--accent2);box-shadow:0 6px 20px rgba(26,122,74,.12)}}
   .disc-icon{{font-size:1.6rem;margin-bottom:10px}}
-  .disc-title{{font-weight:600;margin-bottom:8px;font-size:.95rem}}
-  .disc-text{{color:var(--muted);font-size:.85rem;line-height:1.6}}
+  .disc-title{{font-weight:700;margin-bottom:8px;font-size:.95rem;color:var(--accent3)}}
+  .disc-text{{color:var(--muted);font-size:.85rem;line-height:1.7}}
+
+  /* ── split badges ── */
   .split-badge{{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap}}
-  .split-item{{background:var(--card);border:1px solid var(--border);border-radius:10px;
-    padding:14px 20px;text-align:center;flex:1;min-width:120px}}
-  .split-pct{{font-family:var(--mono);font-size:1.6rem;font-weight:700;color:var(--accent1)}}
-  .split-label{{font-size:.75rem;color:var(--muted);text-transform:uppercase;margin-top:4px}}
-  footer{{border-top:1px solid var(--border);padding-top:28px;color:var(--muted);
-    font-size:.8rem;font-family:var(--mono);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}}
+  .split-item{{
+    background:var(--card);border:1px solid var(--border);border-radius:12px;
+    padding:16px 20px;text-align:center;flex:1;min-width:120px;
+    box-shadow:0 2px 8px rgba(26,122,74,.06);
+  }}
+  .split-pct{{font-family:var(--mono);font-size:1.7rem;font-weight:700;color:var(--accent1)}}
+  .split-label{{font-size:.72rem;color:var(--muted);text-transform:uppercase;margin-top:6px;line-height:1.5}}
+
+  /* ── footer ── */
+  footer{{
+    border-top:2px solid var(--border);padding-top:28px;color:var(--muted);
+    font-size:.8rem;font-family:var(--mono);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+    align-items:center;
+  }}
+  .footer-logo{{
+    background:var(--accent1);color:white;padding:4px 10px;
+    border-radius:4px;font-size:.75rem;
+  }}
+
   @keyframes fadeUp{{from{{opacity:0;transform:translateY(20px)}}to{{opacity:1;transform:translateY(0)}}}}
 </style>
 </head>
@@ -215,9 +299,12 @@ HTML = f"""<!DOCTYPE html>
 <div class="wrap">
 
   <header>
-    <span class="tag">PosTech · Tech Challenge · Fase 1 — Projeto B</span>
+    <div class="header-top">
+      <div class="cross">🏥</div>
+      <span class="tag">PosTech · Tech Challenge · Fase 1 — Projeto B</span>
+    </div>
     <h1>Sistema de Suporte ao<br><span>Diagnóstico Hospitalar</span></h1>
-    <p class="subtitle">Classificação de exames médicos com Machine Learning para apoio a médicos e equipes clínicas. Dataset: Breast Cancer Wisconsin.</p>
+    <p class="subtitle">Classificação de exames médicos com Machine Learning para apoio a médicos e equipes clínicas. Dataset: Breast Cancer Wisconsin — 569 pacientes.</p>
   </header>
 
   <!-- Divisão dos dados -->
@@ -348,6 +435,7 @@ HTML = f"""<!DOCTYPE html>
 
   <footer>
     <span>Tech Challenge · Fase 1 · Projeto B · PosTech</span>
+    <span class="footer-logo">🏥 Sistema de Diagnóstico Hospitalar</span>
     <span>Breast Cancer Wisconsin · scikit-learn · SHAP</span>
   </footer>
 
